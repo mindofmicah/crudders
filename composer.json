@@ -1,0 +1,21 @@
+{
+    "name": "mindofmicah/crudders",
+    "description": "",
+    "authors": [
+        {
+            "name": "micah eschbacher",
+            "email": "micah@whamdonk.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "":"src/",
+            "MindOfMicah\\Crudders": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
