@@ -40,7 +40,7 @@ class FeatureContext extends BehatContext
      */
     public static function tearDown()
     {
-    
+        \Illuminate\Support\Facades\File::deleteDirectory(base_path('workbench/mindofmicah/crudders/tests/tmp'), true);
     }
 
     /**
@@ -61,7 +61,8 @@ class FeatureContext extends BehatContext
     {
         $this->tester = new CommandTester(App::make('MindOfMicah\Crudders\Commands\AddCreatorCommand'));
         $this->tester->execute([
-            'creatorName' => $arg1
+            'creatorName' => $arg1,
+            '--path'=>'workbench/mindofmicah/crudders/tests/tmp'
         ]);
     }
 
@@ -93,7 +94,8 @@ class FeatureContext extends BehatContext
     {
         $this->tester = new CommandTester(App::make('MindOfMicah\Crudders\Commands\AddCreatorCommand'));
         $this->tester->execute([
-            'creatorName' => $creator_name
+            'creatorName' => $creator_name,
+            '--path' => __DIR__ . '/../../tmp'
         ]);
     }
 }
