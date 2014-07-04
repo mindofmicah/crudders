@@ -2,12 +2,14 @@
 namespace MindOfMicah\Crudders\Commands;
 
 use Illuminate\Console\Command;
+
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-
+use Illuminate\Config\Repository as Config;
 use MindOfMicah\Classy\Filey;
 use MindOfMicah\Classy\Classy;
 use MindOfMicah\Classy\Funky;
+use Illuminate\Filesystem\Filesystem;
 
 class AddCreatorCommand extends Command {
 
@@ -16,7 +18,7 @@ class AddCreatorCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'command:name';
+	protected $name = 'crudders:c';
 
 	/**
 	 * The console command description.
@@ -30,8 +32,13 @@ class AddCreatorCommand extends Command {
 	 *
 	 * @return void
 	 */
-	public function __construct()
+    protected $file;
+    protected $config;
+
+	public function __construct(Filesystem $filesystem, Config $config)
 	{
+        $this->file = $filesystem;
+        $this->config = $config;
 		parent::__construct();
 	}
 
@@ -42,31 +49,22 @@ class AddCreatorCommand extends Command {
 	 */
 	public function fire()
 	{
-		//
+        $class_name = $this->argument('creatorName') . 'Creator';
+        $file_name = $this->getOptionOrConfigValue('path', 'creator_path') . '/' . $class_name . '.php';
+
         $this->info('Created');
-
-        $filey=  new Filey;
-        $classy =new Classy('SampleCreator');
-        $classy->willExtend('MindOfMicah\Crudders\Creator'); 
-        $classy->willImplement('MindOfMicah\Crudders\Interfaces\CreationHandler');
-    
-          $f = new Funky('create');
-          $f->Param('array $inputs = []');
-          $f->Param('\MindOfMicah\Crudders\Interfaces\CreationHandler $callable = null');
-
-        $classy->addFunction($f);
-        $f = new Funky('onCreationSuccess');
-        $f->param('Eloquent $model');
-        $classy->addFunction($f);
-        $f = new Funky('onCreationError');
-        $f->param('Illuminate\Support\MessageBag $errors');
-        $classy->addFunction($f);
-        $filey->append($classy);
-
-
-        $contents = $filey->render() . "\n";;        
-        file_put_contents('tests/tmp/SampleCreator.php', $contents);
+        $this->file->put($file_name, $this->buildFileContents($class_name));
 	}
+
+    private function getOptionOrConfigValue($option, $config_name)
+    {
+        $path = $this->option('path');
+        if ($path) {
+            return $path;
+        }
+        return $this->config->get('crudders::config.'.$config_name);
+    }
+
 
 	/**
 	 * Get the console command arguments.
@@ -88,8 +86,35 @@ class AddCreatorCommand extends Command {
 	protected function getOptions()
 	{
 		return array(
-			array('example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
+			array('path', 'p', InputOption::VALUE_OPTIONAL, 'Where this creator will be placed.', null),
 		);
 	}
+
+    /**
+     * @return string
+     */
+    protected function buildFileContents($class_name)
+    {
+        $filey = new Filey;
+        $classy = new Classy($class_name);
+        $classy->willExtend('MindOfMicah\Crudders\Creator');
+        $classy->willImplement('MindOfMicah\Crudders\Interfaces\CreationHandler');
+
+        $f = new Funky('create');
+        $f->Param('array $inputs = []');
+        $f->Param('\MindOfMicah\Crudders\Interfaces\CreationHandler $callable = null');
+
+        $classy->addFunction($f);
+        $f = new Funky('onCreationSuccess');
+        $f->param('Eloquent $model');
+        $classy->addFunction($f);
+        $f = new Funky('onCreationError');
+        $f->param('Illuminate\Support\MessageBag $errors');
+        $classy->addFunction($f);
+        $filey->append($classy);
+
+        $contents = $filey->render() . "\n";;
+        return $contents;
+    }
 
 }
