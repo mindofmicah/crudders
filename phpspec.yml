@@ -1,0 +1,7 @@
+suites:
+    suite:
+        src_path: src
+        spec_prefix: spec
+        namespace: MindOfMicah\Crudders
+
+formatter.name: pretty
