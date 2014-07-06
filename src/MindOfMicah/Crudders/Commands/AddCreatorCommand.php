@@ -101,21 +101,24 @@ class AddCreatorCommand extends Command {
         $filey = new Filey;
         $classy = new Classy($class_name);
         $classy->willExtend('MindOfMicah\Crudders\Creator');
-        $classy->willImplement('MindOfMicah\Crudders\Interfaces\CreationHandler');
 
         $f = new Funky('create');
         $f->Param('array $inputs = []');
-        $f->Param('\MindOfMicah\Crudders\Interfaces\CreationHandler $callable = null');
+        $f->Param('\MindOfMicah\Crudders\Interfaces\CreationHandler $listener');
+
+        $f->line('try {');
+        $f->line('$this->validator->validate($inputs)');
+        $f->line('} catch (FormValidationException $e) {');
+        $f->line('return $listener->onCreationFailure($e->getErrors())');
+        $f->line('}');
+        $f->line('// $model = ModelClass::create($inputs)');
+        $f->returns('$listener->onCreationSuccess($model)');
 
         $classy->addFunction($f);
-        $f = new Funky('onCreationSuccess');
-        $f->param('Eloquent $model');
-        $classy->addFunction($f);
-        $f = new Funky('onCreationError');
-        $f->param('Illuminate\Support\MessageBag $errors');
-        $classy->addFunction($f);
+
+
         $filey->append($classy);
-
+        $filey->addUseStatement('MindOfMicah\Forms\FormValidationException');
         $contents = $filey->render() . "\n";;
         return $contents;
     }

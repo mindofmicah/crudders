@@ -1,18 +1,18 @@
 <?php
 use MindOfMicah\Crudders\Creator;
 use MindOfMicah\Crudders\Interfaces\CreationHandler;
-use Eloquent;
-use Illuminate\Support\MessageBag;
+use MindOfMicah\Forms\FormValidationException;
 
-class SampleCreator extends Creator implements CreationHandler
+class SampleCreator extends Creator
 {
-    public function create(array $inputs = [], CreationHandler $callable = null)
+    public function create(array $inputs = [], CreationHandler $listener)
     {
-    }
-    public function onCreationSuccess(Eloquent $model)
-    {
-    }
-    public function onCreationError(MessageBag $errors)
-    {
+        try {
+            $this->validator->validate($inputs);
+        } catch (FormValidationException $e) {
+            return $listener->onCreationFailure($e->getErrors());
+        }
+        // $model = ModelClass::create($inputs);
+        return $listener->onCreationSuccess($model);
     }
 }
