@@ -13,5 +13,5 @@ abstract class Creator
         $this->validator = $validator;
     }
 
-    abstract public function create(array $inputs = [], CreationHandler $callable = null);
+    abstract public function create(array $inputs = [], CreationHandler $callable);
 }
