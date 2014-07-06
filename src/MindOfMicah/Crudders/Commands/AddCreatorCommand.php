@@ -50,11 +50,14 @@ class AddCreatorCommand extends Command {
 	public function fire()
 	{
         $class_name = $this->argument('creatorName') . 'Creator';
-        $file_name = $this->getOptionOrConfigValue('path', 'creator_path') . '/' . $class_name . '.php';
+
+        $file_name = $this->grabPath() . '/' . $class_name . '.php';
 
         $this->info('Created');
         $this->file->put($file_name, $this->buildFileContents($class_name));
 	}
+
+
 
     private function getOptionOrConfigValue($option, $config_name)
     {
@@ -115,6 +118,20 @@ class AddCreatorCommand extends Command {
 
         $contents = $filey->render() . "\n";;
         return $contents;
+    }
+
+    /**
+     * @return string
+     */
+    private function grabPath()
+    {
+        $path = $this->getOptionOrConfigValue('path', 'creator_path');
+
+        if (!$this->file->isDirectory($path)) {
+            $this->file->makeDirectory($path, 755, true);
+        }
+
+        return $path;
     }
 
 }
