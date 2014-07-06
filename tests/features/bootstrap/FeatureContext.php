@@ -56,7 +56,7 @@ class FeatureContext extends BehatContext
         $this->tester = new CommandTester(App::make('MindOfMicah\Crudders\Commands\AddCreatorCommand'));
         $this->tester->execute([
             'creatorName' => $creator_name,
-            '--path' => __DIR__ . '/../../tmp'
+            '--path' => __DIR__ . '/../../tmp/Creators'
         ]);
     }
 
