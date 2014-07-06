@@ -12,12 +12,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../../../vendor/phpunit/phpunit/PHPUnit/Framework/Assert/Functions.php';
-//
-// Require 3rd-party libraries here:
-//
-//   require_once 'PHPUnit/Autoload.php';
-//   require_once 'PHPUnit/Framework/Assert/Functions.php';
-//
 
 /**
  * Features context.
@@ -55,14 +49,14 @@ class FeatureContext extends BehatContext
     }
 
     /**
-     * @When /^I generate a migration with the name \'([^\']*)\' and fields \'([^\']*)\'$/
+     * @When /^I create a new creator with the name "([^"]*)"$/
      */
-    public function iGenerateAMigrationWithTheNameAndFields($arg1, $arg2)
+    public function iCreateANewCreatorWithTheName($creator_name)
     {
         $this->tester = new CommandTester(App::make('MindOfMicah\Crudders\Commands\AddCreatorCommand'));
         $this->tester->execute([
-            'creatorName' => $arg1,
-            '--path'=>'workbench/mindofmicah/crudders/tests/tmp'
+            'creatorName' => $creator_name,
+            '--path' => __DIR__ . '/../../tmp'
         ]);
     }
 
@@ -71,7 +65,7 @@ class FeatureContext extends BehatContext
      */
     public function iShouldSee($output)
     {
-        assertContains($output, $this->tester->getDisplay());                              
+        assertContains($output, $this->tester->getDisplay());
     }
 
     /**
@@ -87,15 +81,4 @@ class FeatureContext extends BehatContext
         );
     }
 
-    /**
-     * @When /^I create a new creator with the name "([^"]*)"$/
-     */
-    public function iCreateANewCreatorWithTheName($creator_name)
-    {
-        $this->tester = new CommandTester(App::make('MindOfMicah\Crudders\Commands\AddCreatorCommand'));
-        $this->tester->execute([
-            'creatorName' => $creator_name,
-            '--path' => __DIR__ . '/../../tmp'
-        ]);
-    }
 }
